@@ -16,6 +16,7 @@ public class CoffeeShell {
         BufferedReader console = new BufferedReader(
                 new InputStreamReader(System.in)
                 );
+        CommandProcessor builtinProcessor = new CommandProcessor();
 
         // Break out with <ctrl><C>
         while (true) {
@@ -36,26 +37,28 @@ public class CoffeeShell {
                 commandLine = commandLine.replaceAll("\\s+", " ");
                 List<String> parameters = Arrays.asList(commandLine.split(" "));
                 try {
-                    // (2) Creating a new process with user-provided parameters
-                    ProcessBuilder procBuilder = new ProcessBuilder(parameters);
-                    Process proc = procBuilder.start();
+                    if (builtinProcessor.executeCommand(commandLine.split(" ")) == -1) {
+                        // (2) Creating a new process with user-provided parameters
+                        ProcessBuilder procBuilder = new ProcessBuilder(parameters);
+                        Process proc = procBuilder.start();
 
-                    // Obtain process input stream, and create a buffered reader
-                    InputStream inputStream = proc.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(
-                            inputStream
-                            );
-                    BufferedReader bufferedReader = new BufferedReader(
-                            inputStreamReader
-                            );
+                        // Obtain process input stream, and create a buffered reader
+                        InputStream inputStream = proc.getInputStream();
+                        InputStreamReader inputStreamReader = new InputStreamReader(
+                                inputStream
+                                );
+                        BufferedReader bufferedReader = new BufferedReader(
+                                inputStreamReader
+                                );
 
-                    // Output the process output line-by-line
-                    String line = bufferedReader.readLine();
-                    while (line != null) {
-                        System.out.println(line);
-                        line = bufferedReader.readLine();
+                        // Output the process output line-by-line
+                        String line = bufferedReader.readLine();
+                        while (line != null) {
+                            System.out.println(line);
+                            line = bufferedReader.readLine();
+                        }
+                        bufferedReader.close();
                     }
-                    bufferedReader.close();
                 } catch (java.io.IOException e) {
                     System.out.println(
                             "Command " + parameters.get(0) + " not found!"
